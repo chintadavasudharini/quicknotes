@@ -29,7 +29,7 @@
 
   <!-- Main Content -->
   <div class="main-content">
-    <h2>Welcome {{ session['suemail'] }}</h2>
+    <h2 class="welcome-user">Welcome <span class="welcome-email">{{ session['suemail'] }}</span></h2>
 
 
     <!-- Add Note Section -->
@@ -69,6 +69,16 @@
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("active");
     }
+
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      if (sidebar && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
 
     function closeSidebar() {
       if (window.innerWidth <= 768) {

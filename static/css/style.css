@@ -310,6 +310,29 @@ h1 {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
+.welcome-user {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #333;
+  font-weight: bold;
+}
+.welcome-email {
+  display: block;
+  font-size: 0.8em;
+  color: #a18cd1;
+  margin-top: 5px;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+@media (max-width: 768px) {
+  .welcome-user {
+    font-size: 22px;
+  }
+}
+
+
 h3 {
   margin-top: 25px;
   margin-bottom: 15px;
@@ -652,6 +675,15 @@ hr {
 
 /* Responsive Media Queries */
 @media (max-width: 1024px) {
+  .sidebar {
+    width: 200px;
+  }
+  .sidebar a {
+    padding: 12px 25px;
+  }
+  .sidebar h2 {
+    font-size: 20px;
+  }
   .main-content {
     margin-left: 200px;
     width: calc(100% - 200px);

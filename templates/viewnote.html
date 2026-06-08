@@ -27,7 +27,7 @@
 
   <!-- Main Content -->
   <div class="main-content">
-    <h2>Welcome {{ session['suemail'] }}</h2>
+    <h2 class="welcome-user">Welcome <span class="welcome-email">{{ session['suemail'] }}</span></h2>
 
     <div class="section">
       <h3>View Note: {{ note.n_title }}</h3>
@@ -88,6 +88,15 @@
   <script>
     // Sidebar
     function toggleSidebar() { document.getElementById("sidebar").classList.toggle("active"); }
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      if (sidebar && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
     function closeSidebar() { if (window.innerWidth <= 768) document.getElementById("sidebar").classList.remove("active"); }
     function confirmLogout() { return confirm("Are you sure you want to logout?"); }
     function confirmAction(msg) { return confirm("Are you sure you want to " + msg); }

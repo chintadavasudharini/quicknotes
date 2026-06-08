@@ -303,8 +303,28 @@
       }
     }
 
+    .flex-responsive {
+      display: flex;
+      gap: 15px;
+    }
+
+    .flex-responsive-cards {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+    }
+
     /* Responsive Media Queries */
     @media (max-width: 1024px) {
+      .sidebar {
+        width: 200px;
+      }
+      .sidebar a {
+        padding: 12px 25px;
+      }
+      .sidebar h2 {
+        font-size: 20px;
+      }
       .main-content {
         margin-left: 200px;
         width: calc(100% - 200px);
@@ -332,6 +352,9 @@
       }
       .profile-section {
         width: 95%;
+      }
+      .flex-responsive, .flex-responsive-cards {
+        flex-direction: column;
       }
     }
 
@@ -421,7 +444,7 @@
       <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
       <!-- 3. Total Notes and Files Cards -->
-      <div style="display: flex; justify-content: space-around; gap: 20px; margin: 25px 0;">
+      <div class="flex-responsive-cards" style="margin: 25px 0;">
         <div class="stat-card-small" style="flex: 1; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; text-align: center; background: #fafbfc; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s;">
           <h2 style="font-size: 32px; color: #a18cd1; margin-bottom: 5px; font-weight: bold;">{{ note_count['count(*)'] }}</h2>
           <p style="margin: 0; font-size: 13px; color: #666; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Total Notes</p>
@@ -433,7 +456,7 @@
       </div>
 
       <!-- 4. Download Section -->
-      <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
+      <div class="flex-responsive" style="margin-bottom: 25px; justify-content: center;">
         <a href="{{ url_for('getnotesdata') }}" class="btn" style="flex: 1; text-align: center; padding: 12px 0; border-radius: 8px; display: inline-block;">📥 Download Notes</a>
         <a href="{{ url_for('getfilesdata') }}" class="btn" style="flex: 1; text-align: center; padding: 12px 0; border-radius: 8px; display: inline-block;">📥 Download Files</a>
       </div>
@@ -470,7 +493,7 @@
       <!-- 5. Deletion Section -->
       <div style="margin-bottom: 25px;">
         <h3 style="margin-top: 15px; margin-bottom: 15px; text-align: center; font-size: 18px; color: #444;">Deletion</h3>
-        <div style="display: flex; gap: 15px;">
+        <div class="flex-responsive">
           <a href="{{ url_for('delete_all_notes') }}" class="btn" style="flex: 1; text-align: center; padding: 12px 0; border-radius: 8px; background-color: #e07a5f; color: white;" onclick="return confirm('Are you sure you want to delete ALL notes? This action cannot be undone.');">🗑️ Delete All Notes</a>
           <a href="{{ url_for('delete_all_files') }}" class="btn" style="flex: 1; text-align: center; padding: 12px 0; border-radius: 8px; background-color: #e07a5f; color: white;" onclick="return confirm('Are you sure you want to delete ALL files? This action cannot be undone.');">🗑️ Delete All Files</a>
         </div>
@@ -503,6 +526,15 @@
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("active");
     }
+    document.addEventListener('click', function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const hamburger = document.querySelector('.hamburger');
+      if (sidebar && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
     function confirmLogout() {
       return confirm("Are you sure you want to logout?");
     }
