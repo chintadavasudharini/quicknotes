@@ -386,11 +386,10 @@ def profile():
         cursor = mydb.cursor(dictionary=True)
         cursor.execute('SELECT user_email, user_name, created_at, updated_at, last_login FROM users WHERE user_email=%s', [email])
         user = cursor.fetchone()
-        cursor.execute('select count(*) from notes where user_email=%s',[email])
-        note_count = cursor.fetchone()
-        print(note_count)
-        cursor.execute('select count(*) from files where user_email=%s',[email])
-        file_count = cursor.fetchone()
+        cursor.execute('SELECT COUNT(*) AS cnt FROM notes WHERE user_email=%s', [email])
+        note_count = cursor.fetchone()['cnt']
+        cursor.execute('SELECT COUNT(*) AS cnt FROM files WHERE user_email=%s', [email])
+        file_count = cursor.fetchone()['cnt']
         cursor.close()
         if not user:
             flash('User not found.', 'danger')
