@@ -1,0 +1,8 @@
+.env
+quicknotes/
+.venv/
+__pycache__/
+flask_session/
+*.pem
+*.pyc
+scratch/

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Notes | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <!-- Hamburger button -->
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="{{ url_for('dashboard') }}" onclick="closeSidebar()">
+      <h2>Quick Notes</h2>
+    </a>
+    <a href="{{ url_for('profile') }}" onclick="closeSidebar()">Profile</a>
+    <a href="{{ url_for('add_notes') }}" onclick="closeSidebar()">Add Note</a>
+    <a href="{{ url_for('viewallnotes') }}" onclick="closeSidebar()">View Notes</a>
+    <a href="{{ url_for('fileupload') }}" onclick="closeSidebar()">Upload File</a>
+    <a href="{{ url_for('viewallfiles') }}" onclick="closeSidebar()">View Files</a>
+    <a href="{{ url_for('logout') }}" class="logout" onclick="return confirmLogout()">Logout</a>
+  </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+
+      <h1>Welcome {{ session['suemail'] }}</h1>
+
+      <!-- Flash messages -->
+      <div id="flash-messages">
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div
+          class="flash {% if category == 'success' %}flash-success{% elif category == 'danger' %}flash-danger{% elif category == 'warning' %}flash-warning{% elif category == 'info' %}flash-info{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Dashboard Cards -->
+      <div class="stats-container">
+
+        <div class="stat-card">
+          <h2>{{ notes_count }}</h2>
+          <p>Total Notes</p>
+        </div>
+
+        <div class="stat-card">
+          <h2>{{ files_count }}</h2>
+          <p>Total Files</p>
+        </div>
+
+      </div>
+
+      <!-- Search -->
+      <form method="POST" action="{{ url_for('search') }}">
+        <div class="search-box">
+          <input type="text" id="Search" name="sdata" placeholder="🔍 Search Notes & Files">
+          <button class="btn" type="submit">
+            Search
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+
+        <a href="{{ url_for('add_notes') }}" class="action-btn">
+          ➕ Add Note
+        </a>
+
+        <a href="{{ url_for('fileupload') }}" class="action-btn">
+          📁 Upload File
+        </a>
+
+      </div>
+
+      <!-- Search Results -->
+      {% if search_performed %}
+
+      <div class="section">
+        <h3>Notes Search Results</h3>
+
+        {% if notes_results %}
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Created At</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for note in notes_results %}
+            <tr>
+              <td data-label="Note ID">{{ note.n_id }}</td>
+              <td data-label="Title">{{ note.n_title }}</td>
+              <td data-label="Created At">
+                {{ note.created_at.strftime("%d-%m-%Y %H:%M") }}
+              </td>
+              <td data-label="Action">
+                <a href="javascript:void(0);" class="btn"
+                  onclick="confirmViewNote('{{ note.n_title|escape }}', '{{ note.n_id }}')">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% else %}
+        <p style="text-align:center;color:#555;">
+          No results found for notes.
+        </p>
+        {% endif %}
+      </div>
+
+      <div class="section">
+        <h3>Files Search Results</h3>
+
+        {% if files_results %}
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>File Name</th>
+              <th>Created At</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for file in files_results %}
+            <tr>
+              <td data-label="File ID">{{ file.f_id }}</td>
+              <td data-label="Title">{{ file.f_title }}</td>
+              <td data-label="File Name">{{ file.file_name }}</td>
+              <td data-label="Created At">
+                {{ file.created_at.strftime("%d-%m-%Y %H:%M") }}
+              </td>
+              <td data-label="Action">
+                <a href="{{ url_for('viewfile', fid=file.f_id) }}" class="btn"
+                  onclick="return confirm('Do you want to view this file?')">
+                  View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% else %}
+        <p style="text-align:center;color:#555;">
+          No results found for files.
+        </p>
+        {% endif %}
+      </div>
+
+      {% endif %}
+
+      <div class="footer">
+        © 2025 Quick Notes
+      </div>
+
+    </div>
+  
+
+  <script>
+    function confirmViewNote(title, nid) {
+      if (confirm(`Do you want to view note: "${title}"?`)) {
+        window.location.href = `/viewnote/${nid}`;
+      }
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    function closeSidebar() {
+      if (window.innerWidth <= 768) document.getElementById("sidebar").classList.remove("active");
+    }
+
+    function confirmLogout() {
+      return confirm("Are you sure you want to logout?");
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.flash').forEach(el => el.style.opacity = '0');
+      }, 3000);
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Notes | View File</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <!-- Hamburger -->
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="{{ url_for('dashboard') }}" onclick="closeSidebar()"><h2>Quick Notes</h2></a>
+    <a href="{{ url_for('profile') }}" onclick="closeSidebar()">Profile</a>
+    <a href="{{ url_for('add_notes') }}" onclick="closeSidebar()">Add Note</a>
+    <a href="{{ url_for('viewallnotes') }}" onclick="closeSidebar()">View Notes</a>
+    <a href="{{ url_for('fileupload') }}" onclick="closeSidebar()">Upload File</a>
+    <a href="{{ url_for('viewallfiles') }}" onclick="closeSidebar()">View Files</a>
+    <a href="{{ url_for('logout') }}" class="logout" onclick="return confirmLogout()">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>Welcome {{ session['suemail'] }}</h2>
+    <div class="section">
+      <h3>View File: {{ file.f_title }}</h3>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div id="flash-messages">
+        {% for category, message in messages %}
+        <div
+          class="flash {% if category=='success' %}flash-success{% elif category=='danger' %}flash-danger{% elif category=='warning' %}flash-warning{% elif category=='info' %}flash-info{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <!-- File Form -->
+      <form id="fileForm" method="POST" action="{{ url_for('edit_file', fid=fid) }}" enctype="multipart/form-data">
+        <input type="text" name="f_title" value="{{ file.f_title }}" disabled>
+        <textarea name="f_description" rows="6" disabled>{{ file.f_description }}</textarea>
+        <input type="file" name="f_file" disabled>
+
+        <!-- File Actions -->
+        <div class="file-actions">
+          <strong>File Name:</strong> {{ file.file_name }}
+          {% set ext = file.file_name.rsplit('.', 1)[1].lower() %}
+          {% if ext in ['pdf','txt','jpg','jpeg','png','gif'] %}
+          <a href="{{ url_for('viewfileonly', fid=fid) }}" target="_blank" class="btn">View File</a>
+          {% elif ext in ['doc','docx','ppt','pptx','xlsx'] %}
+          <a href="{{ url_for('download_file', fid=fid) }}" class="btn"
+            onclick="return confirmAction('download and open this file?')">Open File</a>
+          {% else %}
+          <a href="{{ url_for('download_file', fid=fid) }}" class="btn"
+            onclick="return confirmAction('download this file?')">View/Download</a>
+          {% endif %}
+          <a href="{{ url_for('download_file', fid=fid) }}" class="btn"
+            onclick="return confirmAction('download this file?')">Download File</a>
+        </div>
+
+        <p><strong>Uploaded At:</strong> {{ file.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}</p>
+
+        <!-- Edit/Delete Buttons -->
+        <div class="actions">
+          <button type="button" id="editFileBtn" class="btn">Edit</button>
+          <button type="button" id="cancelBtn" class="btn" style="display: none;">Cancel</button>
+          <button type="button" class="btn" onclick="downloadTxt()">Download Content</button>
+          <button type="button" class="delbtn" onclick="openDeleteModal()">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <h3>Confirm Deletion</h3>
+      <p>To confirm, type '{{ file.f_title }}' below:</p>
+      <input type="text" id="confirmInput" placeholder="Type file title here">
+      <br>
+      <button class="btn" type="button" onclick="confirmDelete()">Yes, delete '{{ file.f_title }}'</button>
+      <button class="btn" type="button" style="background:red;color:white;" onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  
+      <div class="footer">
+        © 2025 Quick Notes
+      </div>
+</div>
+
+  <form id="deleteForm" method="POST" action="{{ url_for('delete_file', fid=fid) }}"></form>
+
+  <script>
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+    function closeSidebar() { if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active'); }
+    function confirmLogout() { return confirm("Are you sure you want to logout?"); }
+    function confirmAction(msg) { return confirm("Are you sure you want to " + msg); }
+
+    // Edit file logic
+    const editBtn = document.getElementById("editFileBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const titleInput = document.querySelector("input[name='f_title']");
+    const descInput = document.querySelector("textarea[name='f_description']");
+    const fileInput = document.querySelector("input[name='f_file']");
+    const fileForm = document.getElementById("fileForm");
+    let originalTitle = titleInput.value;
+    let originalDesc = descInput.value;
+
+    editBtn.addEventListener("click", function () {
+      if (titleInput.disabled) {
+        titleInput.disabled = false;
+        descInput.disabled = false;
+        if (fileInput) fileInput.disabled = false;
+        editBtn.innerText = "Save";
+        cancelBtn.style.display = "inline-block";
+      } else {
+        if (confirm("Are you sure you want to save changes?")) fileForm.submit();
+      }
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      titleInput.value = originalTitle;
+      descInput.value = originalDesc;
+      titleInput.disabled = true;
+      descInput.disabled = true;
+      if (fileInput) fileInput.disabled = true;
+      cancelBtn.style.display = "none";
+      editBtn.innerText = "Edit";
+    });
+
+    function downloadTxt() {
+      const content = `Title: ${titleInput.value}\nDescription: ${descInput.value}\nFilename: {{ file.file_name }}\nUploaded At: {{ file.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}`;
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = titleInput.value ? titleInput.value + ".txt" : "file.txt";
+      link.click();
+    }
+
+    // Delete modal
+    const modal = document.getElementById('deleteModal');
+    function openDeleteModal() { modal.style.display = "block"; }
+    function closeDeleteModal() { modal.style.display = "none"; document.getElementById('confirmInput').value = ''; }
+    function confirmDelete() {
+      const input = document.getElementById('confirmInput').value.trim();
+      if (input === "{{ file.f_title }}") document.getElementById('deleteForm').submit();
+      else alert("File title did not match. Deletion cancelled.");
+    }
+    window.onclick = function (event) { if (event.target == modal) closeDeleteModal(); }
+
+    // Flash fade out
+    window.addEventListener('load', () => {
+      setTimeout(() => { document.querySelectorAll('.flash').forEach(el => el.style.opacity = '0'); }, 3000);
+    });
+  </script>
+</body>
+
+</html>

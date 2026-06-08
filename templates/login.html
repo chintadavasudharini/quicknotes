@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quick Notes | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="public-page">
+
+    <div class="container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div id="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash
+                {% if category == 'success' %}flash-success
+                {% elif category == 'danger' %}flash-danger
+                {% elif category == 'warning' %}flash-warning
+                {% elif category == 'info' %}flash-info
+                {% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <a href="{{ url_for('home') }}" class="logo-link">
+            <div class="logo">📝</div>
+            <h1>Quick Notes</h1>
+        </a>
+
+        <h2>Login</h2>
+
+        <p class="subtitle">
+            Welcome back! Login to access your notes and files.
+        </p>
+
+        <form method="post">
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required>
+                    <span class="eye-icon"
+                        onclick="togglePassword('password', this)">👁️</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn">
+                Login
+            </button>
+
+        </form>
+
+        <div class="links">
+
+            <a href="{{ url_for('forgot_password') }}">
+                Forgot Password?
+            </a>
+
+            <br><br>
+
+            <a href="{{ url_for('register') }}">
+                <b>Create an Account</b>
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        © 2025 Quick Notes
+    </div>
+
+    <script>
+        function togglePassword(id, el) {
+
+            let input = document.getElementById(id);
+
+            if (input.type === "password") {
+                input.type = "text";
+                el.innerHTML = "🙈";
+            } else {
+                input.type = "password";
+                el.innerHTML = "👁️";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Notes | Upload File</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+  <!-- Hamburger button -->
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="{{ url_for('dashboard') }}" onclick="closeSidebar()">
+      <h2>Quick Notes</h2>
+    </a>
+    <a href="{{ url_for('profile') }}" onclick="closeSidebar()">Profile</a>
+    <a href="{{ url_for('add_notes') }}" onclick="closeSidebar()">Add Note</a>
+    <a href="{{ url_for('viewallnotes') }}" onclick="closeSidebar()">View Notes</a>
+    <a href="{{ url_for('fileupload') }}" onclick="closeSidebar()">Upload File</a>
+    <a href="{{ url_for('viewallfiles') }}" onclick="closeSidebar()">View Files</a>
+    <a href="{{ url_for('logout') }}" class="logout" onclick="return confirmLogout()">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>Welcome {{ session['suemail'] }}</h2>
+
+    <!-- Upload File Section -->
+    <div id="add-file" class="section">
+      <h3>Upload File</h3>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div id="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash
+        {% if category == 'success' %}flash-success
+        {% elif category == 'danger' %}flash-danger
+        {% elif category == 'warning' %}flash-warning
+        {% elif category == 'info' %}flash-info
+        {% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <form action="{{ url_for('fileupload') }}" method="POST" enctype="multipart/form-data"
+        onsubmit="return confirmAddFile()">
+        <input type="text" name="f_title" placeholder="File Title" required>
+        <textarea style="height: 150px;" name="f_description" placeholder="File Description (optional)"
+          rows="3"></textarea>
+        <input type="file" name="file" required>
+        <button class="btn" type="submit">Upload</button>
+      </form>
+    </div>
+  
+      <div class="footer">
+        © 2025 Quick Notes
+      </div>
+</div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    function closeSidebar() {
+      if (window.innerWidth <= 768) {
+        document.getElementById("sidebar").classList.remove("active");
+      }
+    }
+
+    function confirmLogout() {
+      return confirm("Are you sure you want to logout?");
+    }
+
+    function confirmAddFile() {
+      return confirm("Are you sure you want to upload this file?");
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.flash').forEach(el => {
+          el.style.opacity = '0';
+        });
+      }, 3000);
+    });
+  </script>
+</body>
+
+</html>

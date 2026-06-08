@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Notes | View Note</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+  <!-- Hamburger button -->
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="{{ url_for('dashboard') }}" onclick="closeSidebar()"><h2>Quick Notes</h2></a>
+    <a href="{{ url_for('profile') }}" onclick="closeSidebar()">Profile</a>
+    <a href="{{ url_for('add_notes') }}" onclick="closeSidebar()">Add Note</a>
+    <a href="{{ url_for('viewallnotes') }}" onclick="closeSidebar()">View Notes</a>
+    <a href="{{ url_for('fileupload') }}" onclick="closeSidebar()">Upload File</a>
+    <a href="{{ url_for('viewallfiles') }}" onclick="closeSidebar()">View Files</a>
+    <a href="{{ url_for('logout') }}" class="logout" onclick="return confirmLogout()">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>Welcome {{ session['suemail'] }}</h2>
+
+    <div class="section">
+      <h3>View Note: {{ note.n_title }}</h3>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div id="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash 
+          {% if category == 'success' %}flash-success
+          {% elif category == 'danger' %}flash-danger
+          {% elif category == 'warning' %}flash-warning
+          {% elif category == 'info' %}flash-info{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <!-- Note Form -->
+      <form id="noteForm" method="POST" action="{{ url_for('editnote', nid=note.n_id) }}">
+        <input type="text" name="n_title" value="{{ note.n_title }}" disabled>
+        <textarea name="n_description" rows="6" disabled>{{ note.n_description }}</textarea>
+        <p><strong>Created At:</strong> {{ note.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}</p>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button type="button" id="editNoteBtn" class="btn">Edit</button>
+          <button type="button" id="cancelBtn" class="btn" style="display: none;">Cancel</button>
+          <a href="{{ url_for('download_note', nid=note.n_id) }}" class="btn"
+             onclick="return confirmAction('download this note?')">Download</a>
+          <button type="button" class="delbtn" onclick="openDeleteModal()">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <h3>Confirm Deletion</h3>
+      <p>To confirm, type '{{ note.n_title }}' below:</p>
+      <input type="text" id="confirmInput" placeholder="Type note name here">
+      <br>
+      <button class="btn" type="button" onclick="confirmDelete()">Yes, delete '{{ note.n_title }}'</button>
+      <button class="btn" type="button" style="background:red;color:white;" onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  
+      <div class="footer">
+        © 2025 Quick Notes
+      </div>
+</div>
+
+  <form id="deleteForm" method="POST" action="{{ url_for('deletenote', nid=note.n_id) }}"></form>
+
+  <script>
+    // Sidebar
+    function toggleSidebar() { document.getElementById("sidebar").classList.toggle("active"); }
+    function closeSidebar() { if (window.innerWidth <= 768) document.getElementById("sidebar").classList.remove("active"); }
+    function confirmLogout() { return confirm("Are you sure you want to logout?"); }
+    function confirmAction(msg) { return confirm("Are you sure you want to " + msg); }
+
+    // Edit note
+    const editBtn = document.getElementById("editNoteBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const titleInput = document.querySelector("input[name='n_title']");
+    const descInput = document.querySelector("textarea[name='n_description']");
+    const noteForm = document.getElementById("noteForm");
+    let originalTitle = titleInput.value, originalDesc = descInput.value;
+
+    editBtn.addEventListener("click", function () {
+      if (titleInput.disabled) {
+        titleInput.disabled = false; descInput.disabled = false;
+        editBtn.innerText = "Save";
+        cancelBtn.style.display = "inline-block";
+      } else {
+        if (confirm("Are you sure you want to save changes?")) {
+          originalTitle = titleInput.value; originalDesc = descInput.value;
+          noteForm.submit();
+        }
+      }
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      titleInput.value = originalTitle;
+      descInput.value = originalDesc;
+      titleInput.disabled = true; descInput.disabled = true;
+      cancelBtn.style.display = "none";
+      editBtn.innerText = "Edit";
+    });
+
+    // Delete modal
+    const modal = document.getElementById("deleteModal");
+    function openDeleteModal() { modal.style.display = "block"; }
+    function closeDeleteModal() { modal.style.display = "none"; document.getElementById("confirmInput").value = ""; }
+    function confirmDelete() {
+      const input = document.getElementById("confirmInput").value.trim();
+      if (input === "{{ note.n_title }}") document.getElementById("deleteForm").submit();
+      else alert("Note name did not match. Deletion cancelled.");
+    }
+    window.onclick = function (event) { if (event.target == modal) closeDeleteModal(); }
+
+    // Flash fade
+    window.addEventListener("load", () => {
+      setTimeout(() => { document.querySelectorAll(".flash").forEach(el => el.style.opacity = "0"); }, 3000);
+    });
+  </script>
+</body>
+</html>

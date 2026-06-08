@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quick Notes | View All Files</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+  <div class="sidebar" id="sidebar">
+    <a href="{{ url_for('dashboard') }}">
+      <h2>Quick Notes</h2>
+    </a>
+    <a href="{{ url_for('profile') }}">Profile</a>
+    <a href="{{ url_for('add_notes') }}">Add Note</a>
+    <a href="{{ url_for('viewallnotes') }}">View Notes</a>
+    <a href="{{ url_for('fileupload') }}">Upload File</a>
+    <a href="{{ url_for('viewallfiles') }}">View Files</a>
+    <a href="{{ url_for('logout') }}" class="logout" onclick="return confirmLogout()">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <h2>Welcome {{ session['suemail'] }}</h2>
+
+    <div id="view-files" class="section">
+      <h3>Your Files</h3>
+
+      <!-- Action Header -->
+      <div class="action-header">
+        <div class="action-center">
+          <span>Total Files: {{ filedata|length }}</span>
+          <a href="{{ url_for('getfilesdata') }}" class="btn" onclick="return confirmGetFilesData()">Get Data</a>
+        </div>
+      </div>
+
+      <a href="{{ url_for('delete_all_files') }}" class="btn delete-all-files-btn delete-all-btn-top-right"
+         onclick="return confirmDeleteAllFiles()">Delete All Files</a>
+
+      <!-- Search -->
+      <div class="search-box">
+        <input type="text" id="fileSearch" placeholder="Search files...">
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div id="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash
+          {% if category == 'success' %}flash-success
+          {% elif category == 'danger' %}flash-danger
+          {% elif category == 'warning' %}flash-warning
+          {% elif category == 'info' %}flash-info
+          {% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {% if filedata %}
+      <table id="filesList" data-sort-dir="asc">
+        <thead>
+          <tr>
+            <th>File ID</th>
+            <th onclick="sortFileTable(1)" style="cursor:pointer;">Title ⬍</th>
+            <th onclick="sortFileTable(2)" style="cursor:pointer;">File Name ⬍</th>
+            <th onclick="sortFileTable(3)" style="cursor:pointer;">Created At ⬍</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in filedata %}
+          <tr>
+            <td data-label="File ID">{{ i.f_id }}</td>
+            <td data-label="Title">{{ i.f_title }}</td>
+            <td data-label="File Name">{{ i.file_name }}</td>
+            <td data-label="Created At">{{ i.created_at.strftime("%d-%m-%Y %H:%M") }}</td>
+            <td data-label="Action">
+              <a href="javascript:void(0);" class="btn"
+                onclick="confirmViewFile('{{ i.f_title|escape }}', '{{ i.f_id }}')">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <center>
+        <p>No files found.</p>
+      </center>
+      {% endif %}
+    </div>
+  
+      <div class="footer">
+        © 2025 Quick Notes
+      </div>
+</div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    function confirmLogout() {
+      return confirm("Are you sure you want to logout?");
+    }
+
+    function confirmGetFilesData() {
+      return confirm("Do you want to export all files data?");
+    }
+
+    function confirmDeleteAllFiles() {
+      return confirm("⚠️ This will permanently delete ALL your files. Are you sure?");
+    }
+
+    function confirmViewFile(title, fid) {
+      if (confirm(`Do you want to view file: ${title}?`)) {
+        window.location.href = `/viewfile/${fid}`;
+      }
+    }
+
+    // Remove highlights
+    function removeHighlights(element) {
+      const highlighted = element.querySelectorAll("span.highlight");
+      highlighted.forEach(span => {
+        span.outerHTML = span.innerText;
+      });
+    }
+
+    function highlightText(element, query) {
+      if (!query) return;
+      const text = element.innerText;
+      const regex = new RegExp(`(${query})`, "gi");
+      element.innerHTML = text.replace(regex, `<span class="highlight">$1</span>`);
+    }
+
+    // Live search
+    document.getElementById("fileSearch").addEventListener("input", function () {
+      const filter = this.value.toLowerCase().trim();
+      document.querySelectorAll("#filesList tbody tr").forEach(row => {
+        const fileIdCell = row.cells[0];
+        const titleCell = row.cells[1];
+        const fileNameCell = row.cells[2];
+        const createdAtCell = row.cells[3];
+
+        removeHighlights(fileIdCell);
+        removeHighlights(titleCell);
+        removeHighlights(fileNameCell);
+        removeHighlights(createdAtCell);
+
+        const fileId = fileIdCell.innerText.toLowerCase();
+        const title = titleCell.innerText.toLowerCase();
+        const fileName = fileNameCell.innerText.toLowerCase();
+        const createdAt = createdAtCell.innerText.toLowerCase();
+
+        const match =
+          fileId.includes(filter) ||
+          title.includes(filter) ||
+          fileName.includes(filter) ||
+          createdAt.includes(filter);
+
+        row.style.display = filter === "" || match ? "" : "none";
+
+        if (match && filter !== "") {
+          highlightText(fileIdCell, filter);
+          highlightText(titleCell, filter);
+          highlightText(fileNameCell, filter);
+          highlightText(createdAtCell, filter);
+        }
+      });
+    });
+
+    function sortFileTable(colIndex) {
+      let table = document.getElementById("filesList");
+      let rows = Array.from(table.tBodies[0].rows);
+      let currentDir = table.getAttribute("data-sort-dir-" + colIndex) || "asc";
+      let newDir = currentDir === "asc" ? "desc" : "asc";
+
+      rows.sort((a, b) => {
+        let valA = a.cells[colIndex].innerText.trim();
+        let valB = b.cells[colIndex].innerText.trim();
+
+        if (colIndex === 3) {
+          let [dA, tA] = valA.split(" ");
+          let [dB, tB] = valB.split(" ");
+          let dateA = new Date(dA.split("-").reverse().join("-") + " " + tA);
+          let dateB = new Date(dB.split("-").reverse().join("-") + " " + tB);
+          return newDir === "asc" ? dateA - dateB : dateB - dateA;
+        }
+
+        return newDir === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      });
+
+      rows.forEach(row => table.tBodies[0].appendChild(row));
+      table.setAttribute("data-sort-dir-" + colIndex, newDir);
+
+      let headers = table.tHead.rows[0].cells;
+      [1, 2, 3].forEach(idx => {
+        headers[idx].innerText = headers[idx].innerText.replace(/( ▲| ▼| ⬍)$/, "") + " ⬍";
+      });
+      headers[colIndex].innerText = headers[colIndex].innerText.replace("⬍", newDir === "asc" ? " ▲" : " ▼");
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.flash').forEach(el => el.style.opacity = '0');
+      }, 3000);
+    });
+  </script>
+</body>
+
+</html>

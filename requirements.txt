@@ -1,0 +1,7 @@
+flask
+flask-session
+flask-excel
+mysql-connector-python
+bcrypt
+itsdangerous
+python-dotenv
