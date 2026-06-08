@@ -309,11 +309,6 @@ def login():
 
                 if check_password_hash(db_password, upassword):
                     session['suemail'] = uemail
-                    try:
-                        cursor.execute('UPDATE users SET last_login = NOW() WHERE user_email = %s', [uemail])
-                        mydb.commit()
-                    except Exception as e:
-                        print("Failed to update last_login:", e)
                     flash('Login successful!', 'success')
                     return redirect(url_for('dashboard'))
                 else:
@@ -384,7 +379,7 @@ def profile():
     email = session['suemail']
     try:
         cursor = mydb.cursor(dictionary=True)
-        cursor.execute('SELECT user_email, user_name, created_at, updated_at, last_login FROM users WHERE user_email=%s', [email])
+        cursor.execute('SELECT user_email, user_name, created_at, updated_at FROM users WHERE user_email=%s', [email])
         user = cursor.fetchone()
         cursor.execute('SELECT COUNT(*) AS cnt FROM notes WHERE user_email=%s', [email])
         note_count = cursor.fetchone()['cnt']
