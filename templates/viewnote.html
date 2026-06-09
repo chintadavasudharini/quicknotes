@@ -54,6 +54,7 @@
         <input type="text" name="n_title" value="{{ note.n_title }}" disabled>
         <textarea name="n_description" rows="6" disabled>{{ note.n_description }}</textarea>
         <p><strong>Created At:</strong> {{ note.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}</p>
+        <p><strong>Lastly Updated:</strong> {{ note.updated_at.strftime('%Y-%m-%d , %H:%M:%S') if note.updated_at else 'N/A' }}</p>
 
         <!-- Actions -->
         <div class="actions">

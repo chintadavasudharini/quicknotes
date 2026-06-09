@@ -909,7 +909,7 @@ def viewnote(nid):
     try:
         cursor = mydb.cursor(dictionary=True, buffered=True)
         cursor.execute(
-            'SELECT n_id, n_title, n_description, created_at FROM notes WHERE n_id=%s AND user_email=%s',
+            'SELECT n_id, n_title, n_description, created_at, updated_at FROM notes WHERE n_id=%s AND user_email=%s',
             [nid, session['suemail']]
         )
         note = cursor.fetchone()
@@ -1144,7 +1144,7 @@ def viewfile(fid):
     try:
         cursor = mydb.cursor(dictionary=True, buffered=True)
         cursor.execute(
-            'SELECT f_title, f_description, file_name, file_data, created_at FROM files WHERE f_id=%s AND user_email=%s',
+            'SELECT f_title, f_description, file_name, file_data, created_at, updated_at FROM files WHERE f_id=%s AND user_email=%s',
             [fid, session['suemail']]
         )
         viewfile = cursor.fetchone()

@@ -68,6 +68,7 @@
         </div>
 
         <p><strong>Uploaded At:</strong> {{ file.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}</p>
+        <p><strong>Lastly Updated:</strong> {{ file.updated_at.strftime('%Y-%m-%d , %H:%M:%S') if file.updated_at else 'N/A' }}</p>
 
         <!-- Edit/Delete Buttons -->
         <div class="actions">
@@ -146,7 +147,7 @@
     });
 
     function downloadTxt() {
-      const content = `Title: ${titleInput.value}\nDescription: ${descInput.value}\nFilename: {{ file.file_name }}\nUploaded At: {{ file.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}`;
+      const content = `Title: ${titleInput.value}\nDescription: ${descInput.value}\nFilename: {{ file.file_name }}\nUploaded At: {{ file.created_at.strftime('%Y-%m-%d , %H:%M:%S') }}\nLastly Updated: {{ file.updated_at.strftime('%Y-%m-%d , %H:%M:%S') if file.updated_at else 'N/A' }}`;
       const blob = new Blob([content], { type: "text/plain" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
