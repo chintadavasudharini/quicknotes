@@ -848,3 +848,30 @@ hr {
     padding: 15px;
   }
 }
+
+.delete-all-notes-btn,
+.delete-all-files-btn {
+  background-color: #ff7675 !important;
+  color: white !important;
+}
+.delete-all-notes-btn:hover,
+.delete-all-files-btn:hover {
+  background-color: #ff6b6b !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.get-data-link {
+  font-weight: bold;
+  text-decoration: underline;
+  color: #a18cd1;
+  margin-left: 10px;
+  transition: color 0.2s ease-in-out;
+}
+.get-data-link:hover {
+  color: #ff7675;
+  text-shadow: 0 0 2px rgba(255, 118, 117, 0.2);
+}
+
+

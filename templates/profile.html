@@ -467,7 +467,7 @@
       <div style="margin-bottom: 25px;">
         <h3 style="margin-top: 15px; margin-bottom: 15px; text-align: center; font-size: 18px; color: #444;">Account Settings</h3>
         <div style="text-align:center;">
-          <button class="btn" type="button" onclick="toggleForm('passwordForm')" style="width: 100%; padding: 12px 0; border-radius: 8px;">🔑 Change Password</button>
+          <button class="btn" type="button" onclick="toggleForm('passwordForm')" style="padding: 10px 20px; border-radius: 8px;">🔑 Change Password</button>
         </div>
         <form id="passwordForm" method="POST" action="{{ url_for('change_password') }}"
           onsubmit="return validatePasswords()" style="display:none; margin-top:20px;">
@@ -484,7 +484,9 @@
               required>
             <span class="eye-icon" onclick="togglePassword('confirm_password', this)">&#128065;</span>
           </div>
-          <button class="btn" type="submit" style="width: 100%; padding: 12px 0; border-radius: 8px; margin-top: 5px;">Update Password</button>
+          <div style="text-align: center; margin-top: 15px;">
+            <button class="btn" type="submit" style="padding: 10px 20px; border-radius: 8px;">Update Password</button>
+          </div>
         </form>
       </div>
 
