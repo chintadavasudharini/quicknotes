@@ -565,3 +565,7 @@ python -c "import flask, bcrypt, itsdangerous; print('All key libraries are impo
 - **LinkedIn:** [Chintada Vasudharini](https://www.linkedin.com/in/chintada-vasudharini-nov21/)
 - **Email:** [chintadavasudharini@gmail.com](mailto:chintadavasudharini@gmail.com)
 - **Personal Portfolio:** [Visit Here](https://portfolio-lime-tau-36.vercel.app/)
+
+---
+
+⭐ If you found this project useful, consider giving it a star on GitHub!
