@@ -40,7 +40,7 @@ A secure, high-performance, and fully responsive web application for note-taking
 - **OTP Verification (Gmail SMTP):** Uses a 6-character, high-entropy OTP for account activation, sent directly to the user's email.
 - **1-Minute Countdown Timer:** Displays on all OTP screens (`otp.html` and `change_password_otp.html`) to visually notify users when their code expires.
 - **Password Hashing:** Implemented with `bcrypt`, generating secure, salted binary hashes stored in the database.
-- **Password Recovery & Timed Links:** "Forgot Password" sends a timed token link generated using `itsdangerous` with an automatic 1-hour expiration limit.
+- **Password Recovery & Timed Links:** "Forgot Password" sends a timed token link generated using `itsdangerous` with an automatic 1-minute expiration limit.
 - **Profile Password Operations:** Allows password updates via current password validation, using a secondary OTP confirmation flow for elevated safety.
 - **Session Security:** Backed by filesystem-based sessions (`Flask-Session`) stored server-side to prevent client-side cookie tampering.
 
@@ -178,7 +178,7 @@ Generates high-entropy OTP codes.
 Provides secure link serialization.
 - Leverages `itsdangerous.URLSafeTimedSerializer` with a customized secret key and salt.
 - Encrypts target data (such as emails) into URL-safe strings used for password recovery paths.
-- Safely decrypts strings while enforcing expiry checks (`loads(token, salt, max_age)`), raising `SignatureExpired` if the age exceeds configured limit (typically 1 hour) or `BadSignature` if the token has been altered.
+- Safely decrypts strings while enforcing expiry checks (`loads(token, salt, max_age)`), raising `SignatureExpired` if the age exceeds configured limit (typically 1 minute) or `BadSignature` if the token has been altered.
 
 #### 5. [secretkeys.py](file:///c:/Users/ADMIN/Desktop/quicknotes/secretkeys.py)
 Exposes configuration keys, mapping them to system environment values or providing runtime fallback defaults.
@@ -286,7 +286,7 @@ Stores uploaded binary files.
 3. **Transmission:** A link pointing to `http://<domain>/resetpassword/<token>` is emailed to the user.
 4. **Validation:** Clicking the link invokes `/resetpassword/<token>`. The system checks:
    - Integrity of token signature (ensuring it was not tampered with).
-   - Expiration age (must be within 1 hour).
+   - Expiration age (must be within 1 minute).
 5. **Modification:** If checks pass, the page displays a secure input form to set a new password, hashing it using `bcrypt` before storing it in the database.
 
 ### 3. File Upload and Storage Mechanics
